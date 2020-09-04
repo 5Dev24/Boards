@@ -1,0 +1,157 @@
+Table of Contents
+
+1. Header, ##
+2. Codes, ##
+3. Keys, ##
+4. Query, ###
+5. Post, ###
+
+
+
+	Header
+
+Every packet sent by the client or server should start with an
+identifier stating that it's a Board packet and the version of Board
+running on the client or server side. When a response comes from a
+server, it should respond with a code to specify how the handling
+of the packet went. See [2. Codes] to see a list of codes and
+how each is triggered.
+
+
+
+	Codes
+
+00: Initial request
+10: Handling was successful
+20: An unknown, server-side, error has occured
+30: An unknown, client-side, error has occured
+40: Malformed packet received
+41: Malformed code in packet generation
+
+
+
+	Keys
+
+The keys protocol is used to exchange encryption keys to allow for secure
+communication between the server and client. The server's public RSA key
+will be known to the client beforehand as servers are stored as IP:RSA_KEY
+and to "join" a boards group, you'd need to acquire this from a member or
+from some other method to be able to participate in cryptographicly secure
+exchanges.
+
+
+
+	Query
+
+The query protocol is used to retrieve data from a board. It is very
+limited and only allows for basic, restricted querying. This is meant
+to act like a weak version of GET where there are certain, stricted
+points that can be queried.
+
+This protocol is initiated by the client as the server should never
+actively seek out a client.
+
+Example of communication
+
+	Example 1:
+
+To: Server
+From: Client
+```
+Board/1.0.0 00
+
+Session abcdefghijklmnopqrst
+Random 597618432698562485612352695762
+
+[Encrypted]Query *
+```
+
+To: Client
+From: Server
+```
+Board/1.0.0 10
+
+Remaining-Requests 59
+Refresh-Time [unix timestamp]
+Length 23
+Checksum 284ac1f446adf4778ba5d6ae390b6e083cae4803
+Random 854623658962541256387532685975
+End-Of-Protocol true
+
+[Encrypted]main,help,general,memes
+```
+
+	Example 2:
+
+To: Server
+From: Client
+```
+Board/1.0.0 00
+
+Session abcdefghijklmnopqrst
+Random 854623658962541256387532685975
+
+[Encrypted]Query main
+```
+
+To: Client
+From: Server
+```
+Board/1.0.0 10
+
+Remaining-Requests 58
+Refresh-Time [unix timestamp]
+Length 4
+Checksum 303739b87f8825b62edeeac940465e87312ea20a
+Random 293705928309451280493129023943
+End-Of-Protocol true
+
+[Encrypted]5 15
+```
+
+	Example 3:
+
+To: Server
+From: Client
+```
+Board/1.0.0 00
+
+Session abcdefghijklmnopqrst
+Length 12
+Checksum **********
+Random 293705928309451280493129023943
+
+[Encrypted]Query main 3
+```
+
+To: Client
+From: Server
+```
+Board/1.0.0 10
+
+Remaining-Requests 57
+Refresh-Time [unix timestamp]
+Length ****
+Checksum ****************************************
+Random 129450959391280120398509180911
+End-Of-Protocol true
+
+[Encrypted]Page 3
+[Encrypted]Posts 10
+[Encrypted][Post 1 data]
+[Encrypted][Post 2 data]
+[Encrypted][Post 3 data]
+[Encrypted][Post 4 data]
+[Encrypted][Post 5 data]
+[Encrypted][Post 6 data]
+[Encrypted][Post 7 data]
+[Encrypted][Post 8 data]
+[Encrypted][Post 9 data]
+[Encrypted][Post 10 data]
+```
+
+
+
+	Post
+
+The post protocol allows for the positng of a new thread
