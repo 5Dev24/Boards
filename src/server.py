@@ -43,7 +43,7 @@ class _RateLimiter:
 			return True
 
 def unix():
-	return int(time.time() * 13)
+	return int(time.time())
 
 def init():
 	server = _Server()

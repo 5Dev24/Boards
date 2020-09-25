@@ -16,6 +16,7 @@ class Protocol(type):
 		proto = super().__new__(cls, name, bases, namespace)
 		if proto is not None:
 			Protocol.__protocols__.append(proto)
+			print(f"Loaded Protocol {name} v{namespace['__version__']}")
 		return proto
 
 	def valid(self):

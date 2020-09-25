@@ -408,13 +408,15 @@ class Database:
 
 		return None
 
-	def save(self, file = None):
-		if file is None:
-			file = open(f"{self.title}.db", "wb")
+	def save(self):
+		file = open(f"{self.title}.db", "wb")
 
 		file.write(shared.Util.ToBase64Bytes(Compression.Compress(\
 			shared.Util.ToBase64String(self.title) + f" {len(self.tables)}")))
 
 		for table in self.tables:
-			file.write(b"\n")
-			table.save(file)
+			tableFileName = f"{self.title}.{table.title}.tbl"
+			tableFile = open(tableFileName, "wb")
+			table.save(tableFile)
+
+			tableFile.close()
